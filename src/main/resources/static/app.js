@@ -13,12 +13,12 @@ function setConnected(connected) {
 }
 
 function connect() {
-    var socket = new SockJS('http://localhost:8080/arduino-websocket');
+    var socket = new SockJS('http://localhost:8080/HighScaleStompServer');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/arduino/subscribers', function (response) {
+        stompClient.subscribe('/stompserver/subscriber/A1B2C3D4', function (response) {
             console.log(response.body)
         });
     });
@@ -34,7 +34,7 @@ function disconnect() {
 
 function sendName() {
     stompClient.send(
-        "/arduino/api/v1/getArduinoResponse",
+        "/stompserver/api/v1/sendmessage/A1B2C3D4",
         {},
         JSON.stringify({
             'deviceSerial': $("#deviceSerial").val(),
