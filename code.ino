@@ -6,8 +6,6 @@
 #include <SoftwareSerial.h>
 #include <WebServer_WT32_ETH01.h>
 
-#define MYPORT_TX 14
-#define MYPORT_RX 15
 #define DEBUG_ETHERNET_WEBSERVER_PORT       Serial
 
 // Debug Level from 0 to 4
@@ -76,12 +74,10 @@ Stomp::Stomp_Ack_t handleResponse(const Stomp::StompCommand cmd) {
   if(cmd.body == "/getScale"){
     getScaleSample = true;
     sendMessage("getScale");
-  }else if(cmd.body == "/getScaleState"){
-    sendMessage("I'm alive");
   }else if(cmd.body == "/getIp"){
     sendMessage((String)ETH.localIP());
-  }else if(cmd.body == "/turnOnCommunicationLed"){
-    sendMessage("turnOnCommunicationLed");
+  }else if(cmd.body == "/ping"){
+    sendMessage("pong");
   }else if(cmd.body == "/getLocation"){
     sendMessage("getLocation");
   }
@@ -135,8 +131,8 @@ void setup() {
   Serial.println(ETH.localIP());
 
 
-  myPort.begin(9600, SWSERIAL_8N1, MYPORT_RX, MYPORT_TX, false);
-  if (!myPort) { // If the object did not initialize, then its configuration is invalid
+  Serial1.begin(9600, SERIAL_8N1, RXD, TXD); // or should I use Serial1.begin(9600)
+  if (!Serial1) { // If the object did not initialize, then its configuration is invalid
     Serial.println("Invalid SoftwareSerial pin configuration, check config");
     while (1) { // Don't continue with invalid configuration
       delay (1000);
@@ -164,9 +160,9 @@ void loop() {
     turnLedOff(BLUELED);
   }
 
-  if(myPort.available() > 0){
+  if(Serial1.available() > 0){
     turnLedOn(YELLOWLED);
-    int inChar = myPort.read();
+    int inChar = Serial1.read();
     if(inChar != '\n'){
       inString += (char)inChar;
     }else{
